@@ -1,10 +1,10 @@
 {
   "scripts": {
-    "lint": "./node_modules/.bin/eslint",
+    "lint": "eslint",
     "check-lint": "lint [0-9]*.js",
     "dev": "npx babel-node",
     "test": "jest",
-    "full-test": "./node_modules/.bin/eslint [0-9]*.js && jest"
+    "full-test": "eslint [0-9]*.js && jest"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
@@ -20,5 +20,12 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "jest": "^29.3.1"
-  }
+  },
+  "name": "0x00-es6_basic",
+  "description": "0x00. ES6 Basics",
+  "version": "1.0.0",
+  "main": ".eslintrc.js",
+  "dependencies": {},
+  "author": "",
+  "license": "ISC"
 }
