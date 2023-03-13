@@ -1,36 +1,38 @@
 const fs = require('fs');
 
 function countStudents(path) {
-  const promise = (res, rej) => {
-    fs.readFile(path, 'utf8', (error, data) => {
-      if (error) rej(Error('Cannot load the database'));
-      const messages = [];
-      let message;
-      const content = data.toString().split('\n');
-      let students = content.filter((item) => item);
-      students = students.map((item) => item.split(','));
-      const nStudents = students.length ? students.length - 1 : 0;
-      message = `Number of students: ${nStudents}`;
-      console.log(message);
-      messages.push(message);
-      const subjects = {};
-      for (const i in students) {
-        if (i !== 0) {
-          if (!subjects[students[i][3]]) subjects[students[i][3]] = [];
-          subjects[students[i][3]].push(students[i][0]);
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, datatext) => {
+      if (err) {
+        reject(Error('Cannot load the database'));
+      } else {
+        const datatxt = datatext.split(/\r?\n/);
+        const data = [];
+        for (const i of datatxt) {
+          if (i !== '') {
+            data.push(i.split(','));
+          }
         }
+        const idxFN = data[0].indexOf('firstname');
+        const idxFD = data[0].indexOf('field');
+        const dict = {};
+        for (const line of data) {
+          if (data.indexOf(line) !== 0) {
+            if (line[idxFD] in dict) {
+              dict[line[idxFD]].push(line[idxFN]);
+            } else {
+              dict[line[idxFD]] = [];
+              dict[line[idxFD]].push(line[idxFN]);
+            }
+          }
+        }
+        console.log(`Number of students: ${data.length - 1}`);
+        for (const [key, value] of Object.entries(dict)) {
+          console.log(`Number of students in ${key}: ${value.length}. List: ${value.join(', ')}`);
+        }
+        resolve(dict);
       }
-      delete subjects.subject;
-      for (const key of Object.keys(subjects)) {
-        message = `Number of students in ${key}: ${
-          subjects[key].length
-        }. List: ${subjects[key].join(', ')}`;
-        console.log(message);
-        messages.push(message);
-      }
-      res(messages);
     });
-  };
-  return new Promise(promise);
+  });
 }
 module.exports = countStudents;

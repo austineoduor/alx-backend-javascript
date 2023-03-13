@@ -1,20 +1,26 @@
 const http = require('http');
 const countStudents = require('./3-read_file_async');
 
-const app = http.createServer(async (req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  if (req.url === '/') res.write('Hello Holberton School!');
-  if (req.url === '/students') {
-    res.write('This is the list of our students\n');
-    try {
-      const data = await countStudents(process.argv[2]);
-      res.end(`${data.join('\n')}`);
-    } catch (error) {
-      res.end(error.message);
-    }
+const app = http.createServer((req, res) => {
+  if (req.url === '/') {
+    res.end('Hello Holberton School!');
+  } else if (req.url === '/students') {
+    countStudents(process.argv[2])
+      .then((data) => {
+        let num = 0;
+        let response = '';
+        for (const [key, value] of Object.entries(data)) {
+          num += value.length;
+          response += `Number of students in ${key}: ${value.length}. List: ${value.join(', ')}\n`;
+        }
+        response = `This is the list of our students\nNumber of students: ${num}\n${response.slice(0, -1)}`;
+        res.end(response);
+      })
+      .catch((error) => {
+        res.end(`This is the list of our students\n${error.message}`);
+      });
+  // res.end(`This is the list of our students ${dict}`);
   }
-  res.end();
 });
 app.listen(1245);
 module.exports = app;
