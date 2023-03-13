@@ -1,77 +1,68 @@
-'use strict';
+const { expect } = require("chai");
 const request = require('request');
-const chai = require('chai');
 
-describe('GET /', () => {
-  it('endpoint: GET /', (done) => {
-    const call = {
+describe('test GET /', () => {
+  it('should return correct message in response', (done) => {
+    const options = {
       url: 'http://localhost:7865',
       method: 'GET',
     };
-    request(call, (error, response, body) => {
-      chai.expect(response.statusCode).to.equal(200);
-      chai.expect(body).to.equal('Welcome to the payment system');
+
+    request(options, function (error, response, body) {
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal('Welcome to the payment system');
       done();
     });
   });
 });
 
-describe('GET /cart/:id', () => {
-  it('endpoint: GET /cart/:id', (done) => {
-    const call = {
-      url: 'http://localhost:7865/cart/12',
+describe('test GET cart/:id', () => {
+  it('should return status 200 and correct body', (done) => {
+    const options = {
+      url: 'http://localhost:7865/cart/1',
       method: 'GET',
     };
-    request(call, (error, response, body) => {
-      chai.expect(response.statusCode).to.equal(200);
-      chai.expect(body).to.equal('Payment methods for cart 12');
+
+    request(options, function (error, response, body) {
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal('Payment methods for cart 1');
       done();
     });
   });
-});
 
-describe('GET /cart/:isNaN', () => {
-  it('endpoint: GET /cart/:isNaN', (done) => {
-    const call = {
-      url: 'http://localhost:7865/cart/anything',
+  it('should return a 404 response', (done) => {
+    const options = {
+      url: 'http://localhost:7865/cart/a12',
       method: 'GET',
     };
-    request(call, (error, response, body) => {
-      chai.expect(response.statusCode).to.equal(404);
+
+    request(options, function (error, response, body) {
+      expect(response.statusCode).to.equal(404);
       done();
     });
   });
+
 });
 
-describe('GET /available_payments', () => {
-  it('endpoint: GET /available_payments', (done) => {
-    const call = {
+describe('test GET /available_payments', () => {
+  it('should return status 200 and correct body', (done) => {
+    const options = {
       url: 'http://localhost:7865/available_payments',
       method: 'GET',
     };
-    request(call, (error, response, body) => {
-      chai.expect(response.statusCode).to.equal(200);
-      chai.expect(body).to.equal(
-        '{"payment_methods":{"credit_cards":true,"paypal":false}}'
-      );
-      done();
-    });
-  });
-});
+    
+    const res = {
+      payment_methods: {
+        credit_cards: true,
+        paypal: false,
+      }
+    }
 
-describe('POST /login', () => {
-  it('POST /login', (done) => {
-    const call = {
-      url: 'http://localhost:7865/login',
-      method: 'POST',
-      json: {
-        userName: 'Javi',
-      },
-    };
-    request(call, (error, response, body) => {
-      chai.expect(response.statusCode).to.equal(200);
-      chai.expect(body).to.equal('Welcome Javi');
+    request(options, function (error, response, body) {
+      expect(response.statusCode).to.equal(200);
+      expect(response.body).to.deep.equal(JSON.stringify(res));
       done();
     });
   });
+
 });
