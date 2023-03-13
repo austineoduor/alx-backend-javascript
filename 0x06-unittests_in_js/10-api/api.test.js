@@ -66,3 +66,20 @@ describe('test GET /available_payments', () => {
   });
 
 });
+
+describe('POST /login', () => {
+  it('POST /login', (done) => {
+    const call = {
+      url: 'http://localhost:7865/login',
+      method: 'POST',
+      json: {
+        userName: 'Javi',
+      },
+    };
+    request(call, (error, response, body) => {
+      chai.expect(response.statusCode).to.equal(200);
+      chai.expect(body).to.equal('Welcome Javi');
+      done();
+    });
+  });
+});
