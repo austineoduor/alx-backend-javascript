@@ -1,34 +1,26 @@
 const fs = require('fs');
 
-function readDatabase(path) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', (err, datatext) => {
-      if (err) {
-        reject(Error('Cannot load the database'));
-      } else {
-        const datatxt = datatext.split(/\r?\n/);
-        const data = [];
-        for (const i of datatxt) {
-          if (i !== '') {
-            data.push(i.split(','));
-          }
-        }
-        const idxFN = data[0].indexOf('firstname');
-        const idxFD = data[0].indexOf('field');
-        const dict = {};
-        for (const line of data) {
-          if (data.indexOf(line) !== 0) {
-            if (line[idxFD] in dict) {
-              dict[line[idxFD]].push(line[idxFN]);
-            } else {
-              dict[line[idxFD]] = [];
-              dict[line[idxFD]].push(line[idxFN]);
-            }
-          }
-        }
-        resolve(dict);
-      }
-    });
-  });
+async function readDatabase(path) {
+  let data;
+  try {
+    data = await fs.promises.readFile(path, 'utf8');
+  } catch (error) {
+    throw new Error('Cannot load the database');
+  }
+  const students = data.split('\n')
+    .map((row) => row.split(','))
+    .filter((row) => row.length === 4 && row[0] !== 'firstname')
+    .map((row) => ({
+      firstName: row[0],
+      lastName: row[1],
+      age: row[2],
+      field: row[3].replace('\r', ''),
+    }));
+  const csStudents = students.filter((student) => student.field === 'CS')
+    .map((student) => student.firstName);
+  const sweStudents = students.filter((student) => student.field === 'SWE')
+    .map((student) => student.firstName);
+  return { csStudents, sweStudents };
 }
-module.exports = readDatabase;
+
+export default readDatabase;
