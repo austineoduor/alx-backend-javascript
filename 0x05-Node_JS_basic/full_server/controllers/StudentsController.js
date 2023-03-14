@@ -1,32 +1,30 @@
-import readDatabase from '../utils';
+const readDatabase = require('../utils');
 
 class StudentsController {
-  static async getAllStudents(req, res) {
-    try {
-      const data = await readDatabase(process.argv[2]);
-      const str1 = 'This is the list of our students\n';
-      const str2 = `Number of students in CS: ${data.csStudents.length}. List: ${data.csStudents.join(', ')}\n`;
-      const str3 = `Number of students in SWE: ${data.sweStudents.length}. List: ${data.sweStudents.join(', ')}`;
-      res.send(str1 + str2 + str3);
-    } catch (e) {
-      res.status(500).send('Cannot load the database');
-    }
+  static getAllStudents(request, response) {
+    readDatabase(process.argv[2])
+      .then((data) => {
+        const printData = [];
+        printData.push('This is the list of our students');
+        for (const field in data) {
+          if (field) printData.push(`Number of students in ${field}: ${data[field].number}. ${data[field].list}`);
+        }
+        response.send(printData.join('\n'));
+      })
+      .catch((err) => { response.send(err.message); });
   }
 
-  static async getAllStudentsByMajor(req, res) {
-    const { major } = req.params;
-
-    if (!['CS', 'SWE'].includes(major)) {
-      return res.status(500).send('Major parameter must be CS or SWE');
-    }
-    try {
-      const data = await readDatabase(process.argv[2]);
-      const list = major === 'CS' ? data.csStudents.join(', ') : data.sweStudents.join(', ');
-      return res.status(200).send(`List: ${list}`);
-    } catch (e) {
-      return res.status(500).send('Cannot load the database');
+  static getAllStudentsByMajor(request, response) {
+    if (!['SWE', 'CS'].includes(request.params.major)) response.status(500).send('Major parameter must be CS or SWE');
+    else {
+      readDatabase(process.argv[2])
+        .then((data) => {
+          if (Object.keys(data).length > 0) response.send(data[request.params.major].list);
+          response.send(500, 'Cannot load the database');
+        })
+        .catch((err) => { response.send(err.message); });
     }
   }
 }
 
-export default StudentsController;
+module.exports = StudentsController;
