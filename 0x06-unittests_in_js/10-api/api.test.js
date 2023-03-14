@@ -68,35 +68,32 @@ describe('test GET /available_payments', () => {
 });
 
 describe('POST /login with body', () => {
-    it('Responds with 200 and correct name Betty', (done) => {
-      const options = {
-        url: 'http://localhost:7865/login',
-        method: 'POST',
-        json: {
-          userName: 'Betty',
-        },
-      };
+	it('Responds with 200 and correct name Betty', (done) => {
+		const options = {
+			url: 'http://localhost:7865/login',
+			method: 'POST',
+			json: {
+				userName: 'Betty',
+			},
+		};
+		request(options, function (error, response, body) {
+			expect(response.statusCode).to.equal(200);
+			expect(body).to.equal('Welcome Betty');
+			done();
+		});
+	});
+});
 
-      request(options, function (error, response, body) {
-        expect(response.statusCode).to.equal(200);
-        expect(body).to.equal('Welcome Betty');
-        done();
-      });
-    });
-  });
-
-  describe('POST /login with no body', () => {
-    it('Responds with 200 and correct name Undefined', (done) => {
-      const options = {
-        url: 'http://localhost:7865/login',
-        method: 'POST',
-      };
-
-      request(options, function (error, response, body) {
-        expect(response.statusCode).to.equal(200);
-        expect(body).to.equal('Welcome undefined');
-        done();
-      });
-    });
-  });
+describe('POST /login with no body', () => {
+	it('Responds with 200 and correct name Undefined', (done) => {
+		const options = {
+			url: 'http://localhost:7865/login',
+			method: 'POST',
+		};
+		request(options, function (error, response, body) {
+			expect(response.statusCode).to.equal(200);
+			expect(body).to.equal('Welcome undefined');
+			done();
+		});
+	});
 });
